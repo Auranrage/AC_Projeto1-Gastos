@@ -13,9 +13,13 @@
 	ask:		.asciiz 	"Qual operacao deseja realizar? "
 
 #		Textos - Registrar Despesa
+<<<<<<< HEAD
 	registro_dia:				.asciiz		"Entre com Dia da Despesa: "
 	registro_mes:				.asciiz		"Entre com Mes da Despesa: "
 	registro_ano:				.asciiz		"Entre com Ano da Despesa: "
+=======
+	registro_data:			.asciiz		"Entre com a Data da Despesa: "
+>>>>>>> c9821b8816352f988c7ee3219c85392fc41b06f8
 	registro_categoria:	.asciiz		"Entre com a Categoria da Despesa: "
 	registro_valor:			.asciiz		"Entre com o Valor da Despesa: "
 
@@ -164,6 +168,7 @@ registrar:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
+<<<<<<< HEAD
 
 	la		$s0 , registro			#	Começo do Registro em S0
 	addi	$t0 , $s0 , 640			#	Fim do Registro em t0
@@ -356,6 +361,146 @@ exibe_registro:
 	jr		$ra
 
 ####===================================####
+=======
+
+	la		$s0 , registro			#	Começo do Registro em S0
+	addi	$t0 , $s0 , 640			#	Fim do Registro em t0
+
+#		Verifica se há espaço para uma nova despesa
+registro_verif:
+	beq		$s0 , $t0 , registro_cheio		##	Verifica se Chegou no Fim do Registro
+	lw		$t1 , 0($s0)
+	beq		$t1 , $zero , registro_add		##	Se não,Verifica se o Indice é Zero (Vazio | Excluído)
+	addi	$s0 , $s0 , 64								##	Se não, Anda no Registro
+	j		registro_verif
+
+#		Erro : Registro Cheio
+registro_cheio:
+	la		$a0, erro_registrar
+	jal		exibe_str
+	j			registro_fim
+
+#		Adiciona Despesa
+registro_add:
+#	Indice
+	lw		$t0, indice		#	Recupera o Indice
+	sw		$t0, 0($s0)		#	Guarda ID
+	addi	$t0, $t0, 1		#	Atualiza o Num do ID
+	sw		$t0, indice		#	Guarda na Memória
+
+#	Data
+	la		$a0, registro_data
+	jal		exibe_str
+
+	li		$v0, 5				#	Recebe Int ( Dia )
+	syscall
+	sw		$v0, 4($s0)		#	Guarda Dia
+	li		$v0, 5				#	Recebe Int ( Mês )
+	syscall
+	sw		$v0, 8($s0)		#	Guarda Mês
+	li		$v0, 5				#	Recebe Int ( Ano )
+	syscall
+	sw		$v0, 12($s0)	#	Guarda Ano
+
+#	Categoria
+	la		$a0, registro_categoria
+	jal		exibe_str
+
+	li		$v0, 8				#	Recebe String
+	la		$a0, 16($s0)	# Passa Endereço do Inicio da String
+	li		$a1, 16				# Tamanho da String = 16bits
+	syscall
+
+#	Valor
+	la		$a0, registro_valor
+	jal		exibe_str
+
+	li		$v0, 6 				#	Recebe Float
+	syscall
+	s.s		$f0, 32($s0)	#	Guarda o Valor (?)
+
+#	Exibe Dados Coletados
+	la		$a0, 0($s0)
+	jal		exibe_registro
+
+registro_fim:
+	lw		$ra , 0($sp)
+	lw		$v0 , 4($sp)
+	addi 	$sp , $sp, 8
+	jr		$ra
+
+####===================================####
+####		Função para a Exibição 				 ####
+####			de um Registro na Memoria		 ####
+####		Argumentos:						 				 ####
+####		$a0 = End. Inicial do Registro ####
+####===================================####
+exibe_registro:
+	addi 	$sp , $sp, -8
+	sw		$ra , 0($sp)
+	sw		$v0 , 4($sp)
+
+	move 	$s0, $a0			#	Copia o End. de A0 p/ S0
+
+	#	Exibe Titulo
+	la		$a0, exibe_titulo
+	jal		exibe_str
+
+	#	Exibe Conteúdo
+	la		$a0, exibe_ID
+	jal		exibe_str
+
+	li		$v0, 1				#	Exibe Int
+	lw		$a0, 0($s0)		#	End. do ID
+	syscall
+
+	la		$a0, exibe_Data
+	jal		exibe_str
+
+	li		$v0, 1				#	Exibe Int
+	lw		$a0, 4($s0)		#	End. do Dia
+	syscall
+
+	la		$a0, exibe_Data0
+	jal		exibe_str
+
+	li		$v0, 1				#	Exibe Int
+	lw		$a0, 8($s0)		#	End. do Mês
+	syscall
+
+	la		$a0, exibe_Data0
+	jal		exibe_str
+
+	li		$v0, 1				#	Exibe Int
+	lw		$a0, 12($s0)	#	End. do Ano
+	syscall
+
+	la		$a0, exibe_Categoria
+	jal		exibe_str
+
+	la		$a0, 16($s0)	#	End. da Categoria
+	jal		exibe_str
+
+	la		$a0, exibe_valor
+	jal		exibe_str
+
+	li		$v0, 2				#	Exibe Float
+	l.s		$f12, 32($s0)	#	End. do Valor
+	syscall
+
+	la		$a0, pula_linha
+	jal		exibe_str
+
+	li 		$v0, 5 				# apenas para esperar um [enter]
+	syscall
+
+	lw		$ra , 0($sp)
+	lw		$v0 , 4($sp)
+	addi 	$sp , $sp, 8
+	jr		$ra
+
+####===================================####
+>>>>>>> c9821b8816352f988c7ee3219c85392fc41b06f8
 ####		Opção Excluir									 ####
 ####===================================####
 excluir:
