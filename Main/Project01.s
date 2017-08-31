@@ -22,6 +22,7 @@
 #		Textos - Erros
 	erro_opcao:				.asciiz		"Erro! Opcao nao Encontrada.\n"
 	erro_registrar:		.asciiz		"Erro! Memoria cheia."
+	erro_exluir:            .asciiz  "Indice nao encontrado."
 
 #		Textos - Exibe Registro
 	exibe_titulo:			.asciiz		"\nDados Coletados:\n"
@@ -31,6 +32,13 @@
 	exibe_Categoria:	.asciiz		" Categoria: "
 	exibe_valor:			.asciiz		" Valor: "
 	pula_linha:				.asciiz		"\n"
+	
+#       Textos-Exclui Elemento
+
+	nexcluir:       .asciiz         "Qual o indiceee? \n"
+	n_encontrado:   .asciiz    "Elemento nao encontrado! \n"
+	excluir_ok:         .asciiz    "Elemento excluido!\n"
+
 
 #		Variáveis
 	registro:	##	Alinhamento de 2^2 bits, 10 x 64 bits alocados
@@ -359,11 +367,58 @@ exibe_registro:
 ####		Opção Excluir									 ####
 ####===================================####
 excluir:
+
+#fazer resumo depois
+#s0 marca o comeco do vetor
+#$t0 mostra o final do vetor para ver se acabou 
+#aux guarda o numero
+
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
+	
+#vai perguntar o numero do indice
+	la  $a0,nexcluir 
+	jal	exibe_str
 
+	li	$v0,5  			#vai ler o inteiro do teclado lembrar que estara em v0 o integer
+	syscall 
+	
+	#addi	$v0, $v0, -48				#	Ajusta de ASCII para DEC
+    la 		$s0 , registro				#Guarda posicao do 1 elemento
+	addi	$s1 , $s0 , 640				#	Fim do Registro em t0 (para guardar os erros)
+	
+	
+#comecar o loop de proximo entao
+excluir_loopprox:
+	beq		$s0, $s1, excluir_nencontrado
+	
+	lw		$t0, 0($s0) 					#vai valer apenas para a primeira vez
+	beq		$t0, $v0, excluir_fimprocura 	#compara item com aux(numero a ser excluido)
+	
+	add		$t4, $zero, $v0
+	
+	li	$v0, 1
+	add	$a0, $t0, $zero
+	syscall
+	
+	add		$v0, $zero, $t4
+	
+	addi	$s0, $s0, 64
+	j		excluir_loopprox
+	
+excluir_nencontrado:
+	la	$a0,n_encontrado
+	jal	exibe_str
+	j	excluir_fim
 
+excluir_fimprocura:
+	la	$a0, excluir_ok
+	jal	exibe_str
+
+	sw	$zero, 0($s0)
+
+excluir_fim:
 	lw		$ra , 0($sp)
 	lw		$v0 , 4($sp)
 	addi 	$sp , $sp, 8
