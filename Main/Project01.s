@@ -1,7 +1,7 @@
-.data	#	Variaveis
+.data	#Variaveis
 	.align 2
-#		Textos - Menu
-	titulo:	.asciiz 	"Programa de Controle de Gastos Pessoais\n"
+#Textos - Menu
+	titulo:		.asciiz 	"Programa de Controle de Gastos Pessoais\n"
 	op:			.asciiz 	"Operacoes:\n"
 	op1:		.asciiz 	"1.	Registrar despesa\n"
 	op2:		.asciiz 	"2.	Excluir despesa\n"
@@ -12,46 +12,47 @@
 	op0:		.asciiz 	"0.	Sair\n"
 	ask:		.asciiz 	"Qual operacao deseja realizar? "
 
-#		Textos - Registrar Despesa
+#Textos - Registrar Despesa
 	registro_dia:				.asciiz		"Entre com Dia da Despesa: "
 	registro_mes:				.asciiz		"Entre com Mes da Despesa: "
 	registro_ano:				.asciiz		"Entre com Ano da Despesa: "
-	registro_categoria:	.asciiz		"Entre com a Categoria da Despesa: "
-	registro_valor:			.asciiz		"Entre com o Valor da Despesa: "
+	registro_categoria:			.asciiz		"Entre com a Categoria da Despesa: "
+	registro_valor:				.asciiz		"Entre com o Valor da Despesa: "
 
-#		Textos - Erros
-	erro_opcao:				.asciiz		"Erro! Opcao nao Encontrada.\n"
-	erro_registrar:		.asciiz		"Erro! Memoria cheia."
-	erro_exluir:            .asciiz  "Indice nao encontrado."
+#Textos - Erros
+	erro_opcao:				.asciiz		"Erro! Opcao inválida.\n"
+	erro_registrar:			.asciiz		"Erro! Memoria cheia."
+	erro_exluir:            .asciiz  	"Indice nao encontrado."
 
-#		Textos - Exibe Registro
+#Textos - Exibe Registro
 	exibe_titulo:			.asciiz		"\nDados Coletados:\n"
-	exibe_ID:					.asciiz		"\tID: "
-	exibe_Data:				.asciiz		" Data: "
+	exibe_ID:				.asciiz		"  ID: "
+	exibe_Data:				.asciiz		"  Data: "
 	exibe_Data0:			.asciiz		"/"
-	exibe_Categoria:	.asciiz		" Categoria: "
-	exibe_valor:			.asciiz		" Valor: "
+	exibe_Categoria:		.asciiz		"  Categoria: "
+	exibe_valor:			.asciiz		"  Valor: R$"
 	pula_linha:				.asciiz		"\n"
+	pressione_enter: 		.asciiz		"Pressione enter para voltar ao menu\n"
 	
-#       Textos-Exclui Elemento
-
-	nexcluir:       .asciiz         "Qual o indiceee? \n"
-	n_encontrado:   .asciiz    "Elemento nao encontrado! \n"
+#Textos - Exclui Elemento
+	nexcluir:       	.asciiz    "Qual o indice?\n"
+	n_encontrado:   	.asciiz    "Elemento nao encontrado!\n"
 	excluir_ok:         .asciiz    "Elemento excluido!\n"
 
 
-#		Variáveis
+#Variáveis
 	registro:	##	Alinhamento de 2^2 bits, 10 x 64 bits alocados
 		.align 2
-		.space	640
-	indice:		.word	1
+		.space 640
+	indice:	
+		.word  1
 
 ####===================================####
 .text
 .globl main
 
 ####===================================####
-####			Função Principal						 ####
+####			Função Principal	   ####
 ####===================================####
 main:
 #	Exibe Menu
@@ -73,52 +74,52 @@ main:
 #	Erro Opção não Encontrada
 	la		$a0, erro_opcao
 	jal		exibe_str
-	j			main_loop				# jump tomain_loop
+	j		main_loop				# jump tomain_loop
 
 #	Chamada Opção Sair
 call_sair:
 	jal		sair
-	j			main_loop				# jump to main_loop
+	j		main_loop				# jump to main_loop
 
 #	Chamada Opção Registrar
 call_registrar:
 	jal		registrar
-	j			main_loop				# jump to 	main_loop
+	j		main_loop				# jump to 	main_loop
 
 #	Chamada Opção Excluir
 call_excluir:
 	jal		excluir
-	j			main_loop				# jump 	main_loop
+	j		main_loop				# jump 	main_loop
 
 #	Chamada Opção Listar Despesas
 call_listar_despesas:
 	jal		listar_despesas
-	j			main_loop				# jump 	main_loop
+	j		main_loop				# jump 	main_loop
 
 #	Chamada Opção Gasto Mensal
 call_gasto_mensal:
 	jal		gasto_mensal
-	j			main_loop				# jump 	main_loop
+	j		main_loop				# jump 	main_loop
 
 #	Chamada Opção Gasto Categoria
 call_gasto_categoria:
 	jal		gasto_categoria
-	j			main_loop				# jump 	main_loop
+	j		main_loop				# jump 	main_loop
 
 	#	Chamada Opção Ranking Despesas
 call_ranking_despesas:
 	jal		ranking_despesas
-	j			main_loop				# jump 	main_loop
+	j		main_loop				# jump 	main_loop
 
 #	Itera
 main_loop:
-	j			main
+	j		main
 
 ####===================================####
 ##	Função para Simplificara a Exibição	 ##
-##							de Strings							 ##
-##	Argumentos:													 ##
-##       $a0 = Endereço da String				 ##
+##							de Strings	 ##
+##	Argumentos:							 ##
+##       $a0 = Endereço da String		 ##
 ####===================================####
 exibe_str:
 	li		$v0 , 4
@@ -155,19 +156,19 @@ exibe_menu:
 	jal		exibe_str
 
 	lw		$ra , 0($sp)
-	# lw		$v0 , 4($sp)
+	#lw		$v0 , 4($sp)
 	addi 	$sp , $sp, 4
 	jr		$ra
-####===================================####
-####		Finalizar o Programa					 ####
-####===================================####
+####====================================####
+####		Finalizar o Programa		####
+####====================================####
 sair:
 	li 		$v0 , 10	#	Encerra o Programa
 	syscall
 
-####===================================####
-####		Opção Registrar								 ####
-####===================================####
+####====================================####
+####		Opção Registrar				####
+####====================================####
 registrar:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -176,7 +177,7 @@ registrar:
 	la		$s0 , registro			#	Começo do Registro em S0
 	addi	$t0 , $s0 , 640			#	Fim do Registro em t0
 
-#		Verifica se há espaço para uma nova despesa
+#Verifica se há espaço para uma nova despesa
 registro_verif:
 	beq		$s0 , $t0 , registro_cheio		##	Verifica se Chegou no Fim do Registro
 	lw		$t1 , 0($s0)
@@ -184,76 +185,77 @@ registro_verif:
 	addi	$s0 , $s0 , 64								##	Se não, Anda no Registro
 	j		registro_verif
 
-#		Erro : Registro Cheio
+#Erro : Registro Cheio
 registro_cheio:
 	la		$a0, erro_registrar
 	jal		exibe_str
-	j			registro_fim
+	j		registro_fim
 
-#		Adiciona Despesa
+#Adiciona Despesa
 registro_add:
-#	Indice
+
+#Indice
 	lw		$t0, indice		#	Recupera o Indice
 	sw		$t0, 0($s0)		#	Guarda ID
 	addi	$t0, $t0, 1		#	Atualiza o Num do ID
 	sw		$t0, indice		#	Guarda na Memória
 
-#	Data
+#Data
 	la		$a0, registro_dia
 	jal		exibe_str
 
 	li		$v0, 5				#	Recebe Int ( Dia )
 	syscall
-	sw		$v0, 4($s0)		#	Guarda Dia
+	sw		$v0, 4($s0)			#	Guarda Dia
 
-	la		$a0, pula_linha
-	jal		exibe_str
+	##la		$a0, pula_linha
+	##jal		exibe_str
 
 	la		$a0, registro_mes
 	jal		exibe_str
 	li		$v0, 5				#	Recebe Int ( Mês )
 	syscall
-	sw		$v0, 8($s0)		#	Guarda Mês
+	sw		$v0, 8($s0)			#	Guarda Mês
 
-	la		$a0, pula_linha
-	jal		exibe_str
+	##la		$a0, pula_linha
+	##jal		exibe_str
 
 	la		$a0, registro_ano
 	jal		exibe_str
 	li		$v0, 5				#	Recebe Int ( Ano )
 	syscall
-	sw		$v0, 12($s0)	#	Guarda Ano
+	sw		$v0, 12($s0)		#	Guarda Ano
 
-	la		$a0, pula_linha
-	jal		exibe_str
+	##la		$a0, pula_linha
+	##jal		exibe_str
 
-#	Categoria
+#Categoria
 	la		$a0, registro_categoria
 	jal		exibe_str
 
-	li		$v0, 8				#	Recebe String
-	la		$a0, 16($s0)	# Passa Endereço do Inicio da String
+	li		$v0, 8				# Recebe String
+	la		$a0, 16($s0)		# Passa Endereço do Inicio da String
 	li		$a1, 16				# Tamanho da String = 16bits
 	syscall
 
 	la		$a0, 16($s0)	# Passa Endereço do Inicio da String
-	jal		string_arruma	#	Verifica se o ENTER entrou como caracter, se sim limpa
+	jal		string_arruma	# Verifica se o ENTER entrou como caracter, se sim limpa
 
-	la		$a0, pula_linha
-	jal		exibe_str
+	##la		$a0, pula_linha
+	##jal		exibe_str
 
-#	Valor
+#Valor
 	la		$a0, registro_valor
 	jal		exibe_str
 
 	li		$v0, 6 				#	Recebe Float
 	syscall
-	s.s		$f0, 32($s0)	#	Guarda o Valor
+	s.s		$f0, 32($s0)		#	Guarda o Valor
 
-	la		$a0, pula_linha
-	jal		exibe_str
+	##la		$a0, pula_linha
+	##jal		exibe_str
 
-#	Exibe Dados Coletados
+#Exibe Dados Coletados
 	la		$a0, 0($s0)
 	jal		exibe_registro
 
@@ -263,12 +265,12 @@ registro_fim:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Função que "Limpa"		 				 ####
-####				o ENTER de uma String			 ####
-####		Argumentos:						 				 ####
-####		$a0 = End. Inicial da String	 ####
-####===================================####
+####========================================####
+####		Função que "Limpa"		 	 	####
+####				o ENTER de uma String	####
+####		Argumentos:					 	####
+####		$a0 = End. Inicial da String 	####
+####========================================####
 string_arruma:
 	addi 	$sp , $sp, -4
 	sw		$ra , 0($sp)
@@ -280,9 +282,9 @@ string_arruma_topo:
 	beq		$t0, $t2, string_arruma_fim
 	add		$t1, $t0, $a0									#	Adiciona o Deslocamento ao End. Inicial
 	lb		$t1, 0($t1)										#	Carrega o Caracter
-	beq		$t1, $t3, string_arruma_troca	#	Verifica se é ENTER (ASCII == 10dec)
+	beq		$t1, $t3, string_arruma_troca					#	Verifica se é ENTER (ASCII == 10dec)
 	addi	$t0, $t0, 1										#	Atualiza o Contador da String
-	j			string_arruma_topo						#	Itera
+	j			string_arruma_topo							#	Itera
 
 string_arruma_troca:
 	add		$t1, $t0, $a0									#	Adiciona o Deslocamento ao End. Inicial
@@ -293,12 +295,12 @@ string_arruma_fim:
 	addi 	$sp , $sp, 4
 	jr		$ra
 
-####===================================####
-####		Função para a Exibição 				 ####
-####			de um Registro na Memoria		 ####
-####		Argumentos:						 				 ####
-####		$a0 = End. Inicial do Registro ####
-####===================================####
+####=========================================####
+####		Função para a Exibição 			 ####
+####			de um Registro na Memoria	 ####
+####		Argumentos:						 ####
+####		$a0 = End. Inicial do Registro 	 ####
+####=========================================####
 exibe_registro:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -313,48 +315,53 @@ exibe_registro:
 	#	Exibe Conteúdo
 	la		$a0, exibe_ID
 	jal		exibe_str
-
 	li		$v0, 1				#	Exibe Int
-	lw		$a0, 0($s0)		#	End. do ID
+	lw		$a0, 0($s0)			#	End. do ID
 	syscall
+	
+	la		$a0, pula_linha     ##Pula Linha
+	jal		exibe_str
 
 	la		$a0, exibe_Data
 	jal		exibe_str
-
 	li		$v0, 1				#	Exibe Int
-	lw		$a0, 4($s0)		#	End. do Dia
+	lw		$a0, 4($s0)			#	End. do Dia
 	syscall
 
 	la		$a0, exibe_Data0
 	jal		exibe_str
-
 	li		$v0, 1				#	Exibe Int
-	lw		$a0, 8($s0)		#	End. do Mês
+	lw		$a0, 8($s0)			#	End. do Mês
 	syscall
-
+		
 	la		$a0, exibe_Data0
 	jal		exibe_str
-
 	li		$v0, 1				#	Exibe Int
-	lw		$a0, 12($s0)	#	End. do Ano
+	lw		$a0, 12($s0)		#	End. do Ano
 	syscall
 
+	la		$a0, pula_linha 	##Pula Linha
+	jal		exibe_str
+	
+	
 	la		$a0, exibe_Categoria
 	jal		exibe_str
-
 	la		$a0, 16($s0)	#	End. da Categoria
 	jal		exibe_str
 
+	la		$a0, pula_linha
+	jal		exibe_str
+	
 	la		$a0, exibe_valor
 	jal		exibe_str
-
 	li		$v0, 2				#	Exibe Float
-	l.s		$f12, 32($s0)	#	End. do Valor
+	l.s		$f12, 32($s0)		#	End. do Valor
 	syscall
 
 	la		$a0, pula_linha
 	jal		exibe_str
-
+	la		$a0, pressione_enter
+	jal		exibe_str
 	li 		$v0, 5 				# apenas para esperar um [enter]
 	syscall
 
@@ -363,9 +370,9 @@ exibe_registro:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Opção Excluir									 ####
-####===================================####
+####====================================####
+####		Opção Excluir				####
+####====================================####
 excluir:
 
 #fazer resumo depois
@@ -424,9 +431,9 @@ excluir_fim:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Opção Listar Despesas					 ####
-####===================================####
+####=====================================####
+####		Opção Listar Despesas		 ####
+####=====================================####
 listar_despesas:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -438,9 +445,9 @@ listar_despesas:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Opção Gasto Mensal						 ####
-####===================================####
+####=================================####
+####		Opção Gasto Mensal		 ####
+####=================================####
 gasto_mensal:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -452,9 +459,9 @@ gasto_mensal:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Opção Gasto por Categoria			 ####
-####===================================####
+####==================================####
+####		Opção Gasto por Categoria ####
+####==================================####
 gasto_categoria:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -466,9 +473,9 @@ gasto_categoria:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Opção Ranking de Despesas			 ####
-####===================================####
+####==================================####
+####		Opção Ranking de Despesas ####
+####==================================####
 ranking_despesas:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
