@@ -17,7 +17,7 @@
 	registro_mes:				.asciiz		"Entre com Mes da Despesa: "
 	registro_ano:				.asciiz		"Entre com Ano da Despesa: "
 	registro_categoria:			.asciiz		"Entre com a Categoria da Despesa: "
-	registro_valor:				.asciiz		"Entre com o Valor da Despesa: "
+	registro_valor:				.asciiz		"\nEntre com o Valor da Despesa: "
 
 #Textos - Erros
 	erro_opcao:				.asciiz		"\nErro! Opcao nao Encontrada.\n"
