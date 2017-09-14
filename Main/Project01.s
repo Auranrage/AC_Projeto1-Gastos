@@ -17,7 +17,7 @@
 	registro_mes:				.asciiz		"Entre com Mes da Despesa: "
 	registro_ano:				.asciiz		"Entre com Ano da Despesa: "
 	registro_categoria:			.asciiz		"Entre com a Categoria da Despesa: "
-	registro_valor:				.asciiz		"Entre com o Valor da Despesa: "
+	registro_valor:				.asciiz		"\nEntre com o Valor da Despesa: "
 
 #Textos - Erros
 	erro_opcao:				.asciiz		"\nErro! Opcao nao Encontrada.\n"
@@ -588,6 +588,15 @@ ranking_despesas:
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
 
+	li $a2, 1       		# store the value 0 in register $f0
+	li $a1, 5
+	
+	slt $a0, $a2, $a1		#Se t0 menor que t1, coloca 1 em t2
+	
+	li		$v0, 2	#	Exibe Float
+	add		$f12, $a0, $zero
+	syscall
+	
 
 	lw		$ra , 0($sp)
 	lw		$v0 , 4($sp)
