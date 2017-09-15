@@ -40,6 +40,23 @@
 
 # Textos - listar_despesas
 	listar_texto:	.asciiz		"\nDados Ordenados por Data\n"
+
+#     Textos-gasto_mensal SE TIVER TEMPO ARRUMO BONITINHO PRA MOSTRAR STRING DE MES, por enquando fica mes msm
+gasto_mensal_m: .asciiz "Mes:"
+m1:  .asciiz  "Janeiro:"
+m2: .asciiz  "Fevereiro:"
+m3: .asciiz  "Marco:"
+m4: .asciiz  "Abril:"
+m5: .asciiz  "Maio:"
+m6: .asciiz  "Junho:"
+m7: .asciiz  "Julho:"
+m8: .asciiz  "Agosto:"
+m9: .asciiz  "Setembro:"
+m10: .asciiz  "Outubro:"
+m11: .asciiz    "Novembro:"
+m12: .asciiz    "Dezembro:"	
+	
+	
 #Variáveis
 	registro:	##	Alinhamento de 2^2 bits, 10 x 64 bits alocados
 		.align 2
@@ -560,7 +577,139 @@ gasto_mensal:
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+#$s0 vai andar no vetor principal, $s1 vai ser o mes, t0 para comprar tanto indice quanto proximos meses,t2 PARA TAMANHO MAXIMO $t3 para a soma
+#rever para ver se ele ira sair do intervalo
+la $s0,registro	
+la $s2,registro
+ addi $s2, $s2,640 #armazenando o numero max do vetor em t2
+  add $s1,$zero,$zero #vai guardar o mes a ser comparado
+ 
+ gasto_mensal_inic:
+ la $s0,registro
+ addi $s1,$s1,1
+ ble $s1,12,gasto_mensal_cntm #continua se menor ou igual a 12 
+j gasto_mensal_fim
+ 
+ gasto_mensal_cntm:					#comeca novamente aqui passa a comecar a verificacao dos meses!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ sub.s $f0, $f0, $f0
+
+ gasto_mensal_se_zero:    			#ve se o indice que vai somar é 0, se for nao iria diantar nada nao eh mesmo lol
+ beq $s0,$s2,gasto_mensal_imprime	#Um erro pode estar aqui em vez de bge eh bgt sei la to com sono se ele estravazar cabo lol, quer dizer maior 
+ lw $t0,0($s0) 						#como nao estourou vamos ver se eh 0
+ bne $t0,0,gasto_mensal_cnt
+ addi $s0,$s0,64
+  
+j gasto_mensal_se_zero
+ 
+gasto_mensal_cnt: #agora sabe que nao eh zero, hora de ver os meses
+lw $t0,8($s0)
+beq $t0,$s1,gasto_mensal_soma
+addi $s0,$s0,64
+j gasto_mensal_se_zero
+
+gasto_mensal_soma:
+lwc1  $f2,32($s0)        #se der problema tentar com "lwc1"
+add.s $f0,$f0,$f2
+addi  $s0,$s0,64
+j gasto_mensal_se_zero
+
+gasto_mensal_imprime:	#exibir mes e gasto
+
+beq $s1,1,gasto_m_j
+beq $s1,2,gasto_m_f
+beq $s1,3,gasto_m_mar
+beq $s1,4,gasto_m_ab
+beq $s1,5,gasto_m_mai
+beq $s1,6,gasto_m_jun
+beq $s1,7,gasto_m_jul
+beq $s1,8,gasto_m_ago
+beq $s1,9,gasto_m_set
+beq $s1,10,gasto_m_out
+beq $s1,11,gasto_m_nov
+
+la $a0,m12
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_j:
+la $a0,m1
+jal exibe_str
+j gasto_mensal_im_cnt
+
+
+gasto_m_f:
+la $a0,m2
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_mar:
+la $a0,m3
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_ab:
+la $a0,m4
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_mai:
+la $a0,m5
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_jun:
+la $a0,m6
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_jul:
+la $a0,m7
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_ago:
+la $a0,m8
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_set:
+la $a0,m9
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_out:
+la $a0,m10
+jal exibe_str
+j gasto_mensal_im_cnt
+
+gasto_m_nov:
+la $a0,m11
+jal exibe_str
+j gasto_mensal_im_cnt
+
+
+	
+gasto_mensal_im_cnt:
+
+
+la $a0,pula_linha
+jal exibe_str
+
+li 		$v0,2
+
+mov.s 	$f12, $f0
+syscall
+
+la $a0,pula_linha
+jal exibe_str
+
+j gasto_mensal_inic
+	
+	
+gasto_mensal_fim:
 	lw		$ra , 0($sp)
 	lw		$v0 , 4($sp)
 	addi 	$sp , $sp, 8
