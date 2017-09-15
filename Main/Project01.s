@@ -1,28 +1,28 @@
 .data	#Variaveis
 	.align 2
 #Textos - Menu
-	titulo:	.asciiz 	"\nPrograma de Controle de Gastos Pessoais\n"
-	op:			.asciiz 	"Operacoes:\n"
-	op1:		.asciiz 	"1.	Registrar despesa\n"
-	op2:		.asciiz 	"2.	Excluir despesa\n"
-	op3:		.asciiz 	"3.	Listar despesas\n"
-	op4:		.asciiz 	"4.	Exibir gasto mensal\n"
-	op5:		.asciiz 	"5.	Exibir gasto por categoria\n"
-	op6:		.asciiz 	"6.	Exibir ranking de despesas\n"
-	op0:		.asciiz 	"0.	Sair\n"
-	ask:		.asciiz 	"Qual operacao deseja realizar? "
+	titulo:					.asciiz 	"\nPrograma de Controle de Gastos Pessoais\n"
+	op:						.asciiz 	"Operacoes:\n"
+	op1:					.asciiz 	"1.	Registrar despesa\n"
+	op2:					.asciiz 	"2.	Excluir despesa\n"
+	op3:					.asciiz 	"3.	Listar despesas\n"
+	op4:					.asciiz 	"4.	Exibir gasto mensal\n"
+	op5:					.asciiz 	"5.	Exibir gasto por categoria\n"
+	op6:					.asciiz 	"6.	Exibir ranking de despesas\n"
+	op0:					.asciiz 	"0.	Sair\n"
+	ask:					.asciiz 	"Qual operacao deseja realizar? "
 
 #Textos - Registrar Despesa
-	registro_dia:				.asciiz		"Entre com Dia da Despesa: "
-	registro_mes:				.asciiz		"Entre com Mes da Despesa: "
-	registro_ano:				.asciiz		"Entre com Ano da Despesa: "
-	registro_categoria:			.asciiz		"Entre com a Categoria da Despesa: "
-	registro_valor:				.asciiz		"\nEntre com o Valor da Despesa: "
+	registro_dia:			.asciiz		"Entre com Dia da Despesa: "
+	registro_mes:			.asciiz		"Entre com Mes da Despesa: "
+	registro_ano:			.asciiz		"Entre com Ano da Despesa: "
+	registro_categoria:		.asciiz		"Entre com a Categoria da Despesa: "
+	registro_valor:			.asciiz		"\nEntre com o Valor da Despesa: "
 
 #Textos - Erros
 	erro_opcao:				.asciiz		"\nErro! Opcao nao Encontrada.\n"
 	erro_registrar:			.asciiz		"\nErro! Memoria cheia."
-	erro_exluir:            .asciiz  	"Indice nao encontrado." ####Essa linha de texto não é utilizada em nenhum lugar do codigo
+	erro_exluir:            .asciiz  	"Indice nao encontrado." ####APAGAR - Essa linha de texto não é utilizada em nenhum lugar do codigo
 
 #Textos - Exibe Registro
 	exibe_titulo:			.asciiz		"\nDados Coletados:\n"
@@ -34,13 +34,14 @@
 	pula_linha:				.asciiz		"\n"
 
 #Textos-Exclui Elemento
-	nexcluir:       	.asciiz    "\nQual o indice? "
-	n_encontrado:   	.asciiz    "Elemento nao encontrado! \n"
-	excluir_ok:         .asciiz    "Elemento excluido!\n"
+	nexcluir:       		.asciiz    "\nQual o indice? "
+	n_encontrado:   		.asciiz    "Elemento nao encontrado! \n"
+	excluir_ok:         	.asciiz    "Elemento excluido!\n"
 
 # Textos - listar_despesas
-	listar_texto:	.asciiz		"\nDados Ordenados por Data\n"
-#Variáveis
+	listar_texto:			.asciiz		"\nDados Ordenados por Data\n"
+
+	#Variáveis
 	registro:	##	Alinhamento de 2^2 bits, 10 x 64 bits alocados
 		.align 2
 		.space 640
@@ -50,6 +51,10 @@
   vetoraux:    ##vetor que sera usado como aux para a organizacao de datas
 		.align 2
 		.space 640
+
+	v_indices:	##	Vetor de Indices Utilizado no BubbleSort
+		.align 2
+	 	.word   0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ####===================================####
 .text
@@ -178,8 +183,8 @@ registrar:
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
 
-	la		$s0 , registro			#	Começo do Registro em S0
-	addi	$t0 , $s0 , 640			#	Fim do Registro em t0
+	la		$s0 , registro					#	Começo do Registro em S0
+	addi	$t0 , $s0 , 640					#	Fim do Registro em t0
 
 #Verifica se há espaço para uma nova despesa
 registro_verif:
@@ -198,36 +203,36 @@ registro_cheio:
 #Adiciona Despesa
 registro_add:
 #Indice
-	lw		$t0, indice		#	Recupera o Indice
-	sw		$t0, 0($s0)		#	Guarda ID
-	addi	$t0, $t0, 1		#	Atualiza o Num do ID
-	sw		$t0, indice		#	Guarda na Memória
+	lw		$t0, indice						#	Recupera o Indice
+	sw		$t0, 0($s0)						#	Guarda ID
+	addi	$t0, $t0, 1						#	Atualiza o Num do ID
+	sw		$t0, indice						#	Guarda na Memória
 
 #Data
 	la		$a0, registro_dia
 	jal		exibe_str
 
-	li		$v0, 5				#Recebe Int ( Dia )
+	li		$v0, 5							#Recebe Int ( Dia )
 	syscall
-	sw		$v0, 4($s0)			#Guarda Dia
+	sw		$v0, 4($s0)						#Guarda Dia
 
 	##la		$a0, pula_linha
 	##jal		exibe_str
 
 	la		$a0, registro_mes
 	jal		exibe_str
-	li		$v0, 5				#Recebe Int ( Mês )
+	li		$v0, 5							#Recebe Int ( Mês )
 	syscall
-	sw		$v0, 8($s0)			#Guarda Mês
+	sw		$v0, 8($s0)						#Guarda Mês
 
 	##la		$a0, pula_linha
 	##jal		exibe_str
 
 	la		$a0, registro_ano
 	jal		exibe_str
-	li		$v0, 5				#Recebe Int ( Ano )
+	li		$v0, 5							#Recebe Int ( Ano )
 	syscall
-	sw		$v0, 12($s0)		#Guarda Ano
+	sw		$v0, 12($s0)					#Guarda Ano
 
 	##la		$a0, pula_linha
 	##jal		exibe_str
@@ -236,13 +241,13 @@ registro_add:
 	la		$a0, registro_categoria
 	jal		exibe_str
 
-	li		$v0, 8				# Recebe String
-	la		$a0, 16($s0)		# Passa Endereço do Inicio da String
-	li		$a1, 16				# Tamanho da String = 16bits
+	li		$v0, 8							# Recebe String
+	la		$a0, 16($s0)					# Passa Endereço do Inicio da String
+	li		$a1, 16							# Tamanho da String = 16bits
 	syscall
 
-	la		$a0, 16($s0)	# Passa Endereço do Inicio da String
-	jal		string_arruma	# Verifica se o ENTER entrou como caracter, se sim limpa
+	la		$a0, 16($s0)					# Passa Endereço do Inicio da String
+	jal		string_arruma					# Verifica se o ENTER entrou como caracter, se sim limpa
 
 	##la		$a0, pula_linha
 	##jal		exibe_str
@@ -251,9 +256,9 @@ registro_add:
 	la		$a0, registro_valor
 	jal		exibe_str
 
-	li		$v0, 6 				#Recebe Float
+	li		$v0, 6 							#Recebe Float
 	syscall
-	s.s		$f0, 32($s0)		#Guarda o Valor
+	s.s		$f0, 32($s0)					#Guarda o Valor
 
 	##la		$a0, pula_linha
 	##jal		exibe_str
@@ -313,7 +318,7 @@ exibe_registro:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
-	
+
 	move 	$s0, $a0		#	Copia o End. de A0 p/ S0
 
 #Exibe Conteúdo
@@ -360,7 +365,7 @@ exibe_registro:
 
 	la		$a0, pula_linha
 	jal		exibe_str
-	
+
 	lw		$ra , 0($sp)
 	lw		$v0 , 4($sp)
 	addi 	$sp , $sp, 8
@@ -387,7 +392,7 @@ excluir:
 	li	$v0,5  							#	vai ler o inteiro do teclado lembrar que estara em v0 o integer
 	syscall
 
-	###########addi	$v0, $v0, -48					#	Ajusta de ASCII para DEC
+	#addi	$v0, $v0, -48				#APAGAR - Ajusta de ASCII para DEC
     la 		$s0 , registro				#	Guarda posicao do 1 elemento
 	addi	$s1 , $s0 , 640				#	Fim do Registro em t0 (para guardar os erros)
 
@@ -584,104 +589,216 @@ gasto_categoria:
 ####	Opção Ranking de Despesas	   ####
 ####===================================####
 ranking_despesas:
-	addi 	$sp , $sp, -8   	#Gravacao e movimentacao do Stackpointer
+	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
-	
-	jal    ordena_valor
-	
-# Exibe
-  	la   	$s0, registro   	# Inicio
-  	addi 	$t0, $s0, 640 	# Fim
 
-exibe_topo:
-	beq  	$s0, $t0, exibe_fim
-  	
-  	la 		$a0,0($s0)
-	jal 	exibe_registro
+	jal		ranking_ordena_valor
 
-  	addi	 $s0, $s0, 64
-	j		exibe_topo
- 
-  exibe_fim: 
-  	lw		$ra , 0($sp)	#Volta o stack pointer ao ponto aonde estava e faz voltar ao menu, ou onde quer que a funcao tenha sido chamada
+	la		$s0, v_indices
+	addi	$s1, $s0, 40						#	Limite
+	
+ranking_exibe_loop:
+	beq		$s0, $s1, ranking_exibe_fim
+	lw		$a0, 0($s1)							#	Recebe o Indice
+	beq		$a0, $0, ranking_exibe_loop_itera
+
+	jal		ranking_fetch_info
+	add		$a0, $v0, $0
+	jal		exibe_registro
+
+ranking_exibe_loop_itera:
+	addi	$s0, $s0, 4							#	Anda com o Vetor
+	j			ranking_exibe_loop
+
+ranking_exibe_fim:
+	lw		$ra , 0($sp)
 	lw		$v0 , 4($sp)
 	addi 	$sp , $sp, 8
 	jr		$ra
- 
- 
-####======================================####
-ordena_valor:
-  addi 	$sp , $sp, -4
-  sw	$ra , 0($sp)
 
-  # Fetch dos Valores
-  la   $s0, registro		# End Inicial do Vetor
-  li   $s1, 0    		# i
-  li   $s2, 0    		# j
+	####===================================####
+	####   Função de Ordenação do Registro ####
+	####      Utilizando BubbleSort        ####
+	####===================================####
+ranking_ordena_valor:
+	  addi $sp , $sp, -4
+	  sw	 $ra , 0($sp)
 
-bubbleSort_i:
-  li   $t0, 40   		# Ultima posição
-  beq  $s1, $t0, bubble_fim 	# Verifica se Chegou no Fim 'i'
+	  # Zera o Vetor de Indices
+	  la   $s0, v_indices
+	  addi $s1, $s0, 40
 
-bubbleSort_j:
-  li   $t0, 36   		# Tam - 1 posição
-  beq  $s2, $t0, bubble_itera_i
+ranking_ordena_valor_zera_vetor:
+	  beq  $s0, $s1, ranking_ordena_valor_zera_vetor_fim
+	  sw   $0, 0($s0)
+	  addi $s0, $s0, 4
+	  j    ranking_ordena_valor_zera_vetor
+	  
+ranking_ordena_valor_zera_vetor_fim:
+	  ## Fetch dos Valores
+	  jal  ranking_fetch_indices
+	  la   $s0, v_indices # End Inicial do Vetor
 
-  ##  Comparação
-  add    $a0, $s0, $s2 	 	# Adiciona o Deslocamento ao End. Inicial
-  jal    bubble_compara
-  ##  Comparação
+	  li   $s1, 0    # i
+	  li   $s2, 0    # j
 
-  li    $t0, 1
-  bne   $v0, $t0, bubble_itera_j  # V0 informa se precisa ordenar
+ranking_bubbleSort_i:
+	  li   $t0, 40   # Tam - 0 posição
+	  beq  $s1, $t0, ranking_bubble_fim  # Verifica se Chegou no Fim 'i'
 
-  # Swap
-  add   $t0, $s0, $s2 # Adiciona o Deslocamento ao End. Inicial
-  lw    $t1, 0($t0)   # v[j]
-  lw    $t2, 64($t0)  # v[j+1]
-  sw    $t2, 0($t0)   # v[j] = v[j+1]
-  sw    $t1, 64($t0)  # v[j+1] = v[j]
+ranking_bubbleSort_j:
+	li   $t0, 36   # Tam - 1 posição
+	beq  $s2, $t0, ranking_bubble_itera_i
 
-bubble_itera_j:
-  addi $s2, $s2, 04  # Anda uma Posição
-  j    bubbleSort_j  # Itera j
+	##  Comparação
+	add   $t0, $s0, $s2  # Adiciona o Deslocamento ao End. Inicial
 
-bubble_itera_i:
-  addi $s1, $s1, 04   # Anda uma Posição
-  li   $s2, 0         # Reinializa j
-  j    bubbleSort_i   # Itera i
+	## Fetch Dos Endereços
+	lw    $a0, 0($t0)   # Recebe o Indice de V[i]
+	jal   ranking_fetch_info
+	add   $s3, $v0, $0  # End. Inicial de V[i]
+	
+	##  Comparação
+	add   $t0, $s0, $s2  # Adiciona o Deslocamento ao End. Inicial
+	 
+	lw    $a0, 4($t0)   # Recebe o Indice de V[i+1]
+	jal   ranking_fetch_info
+	add   $s4, $v0, $0  # End. Inicial de V[i+1]
 
-bubble_fim:
-  # Lista Ordenada
-  lw	 $ra , 0($sp)
+	add   $a0, $s3, $0
+	add   $a1, $s4, $0
+	jal   ranking_bubble_compara
+	##  Comparação
+
+	li    $t0, 1
+	bne   $v0, $t0, ranking_bubble_itera_j  # V0 informa se precisa ordenar
+
+	##  Swap
+	add   $t0, $s0, $s2 # Adiciona o Deslocamento ao End. Inicial
+	lw    $t1, 0($t0)   # v[j]
+	lw    $t2, 4($t0)   # v[j+1]
+	sw    $t2, 0($t0)   # v[j] = v[j+1]
+	sw    $t1, 4($t0)   # v[j+1] = v[j]
+
+ranking_bubble_itera_j:
+	addi $s2, $s2, 04  # Anda uma Posição
+	j    ranking_bubbleSort_j  # Itera j
+
+ranking_bubble_itera_i:
+	addi $s1, $s1, 04   # Anda uma Posição
+	li   $s2, 0         # Reinializa j
+	j    ranking_bubbleSort_i   # Itera i
+
+ranking_bubble_fim:
+	# Lista Ordenada
+	lw	 $ra , 0($sp)
 	addi $sp , $sp, 4
 	jr	 $ra
 
-####===================================####
+	####===================================####
+	####   Função Modular para Comparação  ####
+	####   De V[i] e V[i+1] no BubbleSort  ####
+	####   Argumentos:                     ####
+	####   $a0  ==  End. Inicial de V[i]   ####
+	####   $a1  ==  End. Inicial de V[i+1] ####
+	####   Retorno:                        ####
+	####   $V0  ==  1 , Swap  Nedded       ####
+	####   $V0  ==  0 , Don't Care         ####
+	####===================================####
 
-bubble_compara:
-  ##  Ordem Crescente
-  addi 	$sp , $sp, -12
-  sw	$s0 , 0($sp)
-  sw	$s1 , 4($sp)
-  sw	$s2 , 8($sp)
+	ranking_bubble_compara:
+	  ##  Ordem Crescente
+	  addi $sp , $sp, -12
+	  sw	 $s0 , 0($sp)
+	  sw	 $s1 , 4($sp)
+	  sw	 $s2 , 8($sp)
 
-  lwc1	$f0, 32($a0)  			# V[j]
-  lwc1  $f1, 96($a0) 			# V[j+1]
-  
-#If (V[j+1] < V[j]) $V0 = 1;
-  c.lt.s $f1, $f0			#Compara se f1<f0
-  bc1t b_compara_maior
-  li   $v0, 0   			# V[j] é Menor q V[j+1]
-  j    b_compara_fim
+	  ##  Load da Informação Relevante
+	  lwc1	$f0, 32($a0)  # V[j]
+	  lwc1  $f1, 32($a1)  # V[j+1]
 
-b_compara_maior:
-  li   $v0, 1   			# V[j] é Maior q V[j+1]
+	  # If (V[j] > V[j+1]) $V0 = 1;
+	  c.lt.s $f1, $f0			#Compara se f1<f0
+	  bc1t ranking_b_compara_maior
 
-b_compara_fim:
-  lw	 $s0 , 0($sp)
-  lw	 $s1 , 4($sp)
-  lw	 $s2 , 8($sp)
-  addi $sp , $sp, 12
-  jr	 $ra
+	  li   $v0, 0   # V[j] é Menor q V[j+1]
+	  j    ranking_b_compara_fim
+
+	ranking_b_compara_maior:
+	  li   $v0, 1   # V[j] é Maior q V[j+1]
+
+	ranking_b_compara_fim:
+	  lw	 $s0 , 0($sp)
+	  lw	 $s1 , 4($sp)
+	  lw	 $s2 , 8($sp)
+	  addi $sp , $sp, 12
+	  jr	 $ra
+	####===================================####
+	####          Fetch dos Indices        ####
+	####===================================####
+	ranking_fetch_indices:
+	  addi	$sp , $sp, -4
+	  sw	$ra , 0($sp)
+
+	  la    $v0, v_indices
+	  la    $s0, registro
+	  addi  $s1, $s0, 640   # Limite
+
+	ranking_fetch_indices_loop:
+	  beq    $s0, $s1, ranking_fetch_indices_fim  			# Fim do Registro
+
+	  lw    $t0, 0($s0)    									# Carrega o Indice da Struct
+	  beq   $t0, $0, ranking_fetch_indices_loop_atualiza 	# Verifica se o Indice é Zero ( Struct Vazia )
+
+	  sw    $t0, 0($v0)   									# Guarda o Indice no Vetor
+	  addi  $v0, $v0, 4   									# Atualiza a Posição do Vetor
+
+	ranking_fetch_indices_loop_atualiza:
+	  addi  $s0, $s0, 64  									# Anda para a Proxima Struct
+	  j    ranking_fetch_indices_loop
+
+	ranking_fetch_indices_fim:
+	  lw	 $ra , 0($sp)
+	  addi $sp , $sp, 4
+	  jr	 $ra
+	####===================================####
+	####  Fetch das Informações            ####
+	####                  de Um Indice     ####
+	####  $A0 == Indice Procurado          ####
+	####  Retornos:                        ####
+	####  $V0 == 0 , Indice não Encontrado ####
+	####  $V0 == End. Inicial Da Struct    ####
+	####===================================####
+	ranking_fetch_info:
+	  addi $sp , $sp, -12
+	  sw	 $ra , 0($sp)
+	  sw	 $s3 , 4($sp)
+	  sw	 $s4 , 8($sp)
+
+	  li    $v0, 0    # Saida Padrão caso não seja Encontrado
+
+	  la    $s0, registro
+	  addi  $s1, $s0, 640 # Limite
+
+	ranking_fetch_info_loop:
+	  beq    $s0, $s1, ranking_fetch_info_fim  # Fim do Registro
+
+	  lw    $t0, 0($s0)                       		   # Carrega o Indice da Struct
+	  beq   $t0, $0, ranking_fetch_info_loop_atualiza  # Verifica se o Indice é Zero ( Struct Vazia )
+	  beq   $t0, $a0, ranking_fetch_info_founded       # Verifica se Achou a Struct Correspondente
+
+	ranking_fetch_info_loop_atualiza:
+	  addi  $s0, $s0, 64  # Anda para a Proxima Struct
+	  j    ranking_fetch_info_loop
+
+	ranking_fetch_info_founded:
+	  add    $v0, $s0, $0   # V0 recebe o Endereço Inicial da Struct
+
+	ranking_fetch_info_fim:
+	    lw	 $ra , 0($sp)
+	    sw	 $s3 , 4($sp)
+	    sw	 $s4 , 8($sp)
+	    addi $sp , $sp, 12
+	    jr	 $ra
+	####===================================####
