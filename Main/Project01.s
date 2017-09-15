@@ -584,21 +584,104 @@ gasto_categoria:
 ####	Opção Ranking de Despesas	   ####
 ####===================================####
 ranking_despesas:
-	addi 	$sp , $sp, -8
+	addi 	$sp , $sp, -8   	#Gravacao e movimentacao do Stackpointer
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
+	
+	jal    ordena_valor
+	
+# Exibe
+  	la   	$s0, registro   	# Inicio
+  	addi 	$t0, $s0, 640 	# Fim
 
-	li $a2, 1       		# store the value 0 in register $f0
-	li $a1, 5
-	
-	slt $a0, $a2, $a1		#Se t0 menor que t1, coloca 1 em t2
-	
-	li		$v0, 2	#	Exibe Float
-	add		$f12, $a0, $zero
-	syscall
-	
+exibe_topo:
+	beq  	$s0, $t0, exibe_fim
+  	
+  	la 		$a0,0($s0)
+	jal 	exibe_registro
 
-	lw		$ra , 0($sp)
+  	addi	 $s0, $s0, 64
+	j		exibe_topo
+ 
+  exibe_fim: 
+  	lw		$ra , 0($sp)	#Volta o stack pointer ao ponto aonde estava e faz voltar ao menu, ou onde quer que a funcao tenha sido chamada
 	lw		$v0 , 4($sp)
 	addi 	$sp , $sp, 8
 	jr		$ra
+ 
+ 
+####======================================####
+ordena_valor:
+  addi 	$sp , $sp, -4
+  sw	$ra , 0($sp)
+
+  # Fetch dos Valores
+  la   $s0, registro		# End Inicial do Vetor
+  li   $s1, 0    		# i
+  li   $s2, 0    		# j
+
+bubbleSort_i:
+  li   $t0, 40   		# Ultima posição
+  beq  $s1, $t0, bubble_fim 	# Verifica se Chegou no Fim 'i'
+
+bubbleSort_j:
+  li   $t0, 36   		# Tam - 1 posição
+  beq  $s2, $t0, bubble_itera_i
+
+  ##  Comparação
+  add    $a0, $s0, $s2 	 	# Adiciona o Deslocamento ao End. Inicial
+  jal    bubble_compara
+  ##  Comparação
+
+  li    $t0, 1
+  bne   $v0, $t0, bubble_itera_j  # V0 informa se precisa ordenar
+
+  # Swap
+  add   $t0, $s0, $s2 # Adiciona o Deslocamento ao End. Inicial
+  lw    $t1, 0($t0)   # v[j]
+  lw    $t2, 64($t0)  # v[j+1]
+  sw    $t2, 0($t0)   # v[j] = v[j+1]
+  sw    $t1, 64($t0)  # v[j+1] = v[j]
+
+bubble_itera_j:
+  addi $s2, $s2, 04  # Anda uma Posição
+  j    bubbleSort_j  # Itera j
+
+bubble_itera_i:
+  addi $s1, $s1, 04   # Anda uma Posição
+  li   $s2, 0         # Reinializa j
+  j    bubbleSort_i   # Itera i
+
+bubble_fim:
+  # Lista Ordenada
+  lw	 $ra , 0($sp)
+	addi $sp , $sp, 4
+	jr	 $ra
+
+####===================================####
+
+bubble_compara:
+  ##  Ordem Crescente
+  addi 	$sp , $sp, -12
+  sw	$s0 , 0($sp)
+  sw	$s1 , 4($sp)
+  sw	$s2 , 8($sp)
+
+  lwc1	$f0, 32($a0)  			# V[j]
+  lwc1  $f1, 96($a0) 			# V[j+1]
+  
+#If (V[j+1] < V[j]) $V0 = 1;
+  c.lt.s $f1, $f0			#Compara se f1<f0
+  bc1t b_compara_maior
+  li   $v0, 0   			# V[j] é Menor q V[j+1]
+  j    b_compara_fim
+
+b_compara_maior:
+  li   $v0, 1   			# V[j] é Maior q V[j+1]
+
+b_compara_fim:
+  lw	 $s0 , 0($sp)
+  lw	 $s1 , 4($sp)
+  lw	 $s2 , 8($sp)
+  addi $sp , $sp, 12
+  jr	 $ra
