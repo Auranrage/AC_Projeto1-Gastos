@@ -577,9 +577,9 @@ listar_fim:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####===================================####
-####		Opção Gasto Mensal		   ####
-####===================================####
+####====================================####
+####		Opção Gasto Mensal		   				####
+####====================================####
 gasto_mensal:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -799,11 +799,11 @@ ranking_ordena_valor_zera_vetor_fim:
   li   	$s2, 0    # Inicializa o 'j'
 
 ranking_bubbleSort_i:
-  li   	$t0, 324   			 		 # Tam do Vetor - 1 posição
+  li   	$t0, 360   			 		 # Tam do Vetor - 1 posição
   beq  	$s1, $t0, ranking_bubble_fim  # Verifica se Chegou no Fim 'i'
 
 ranking_bubbleSort_j:
-  li   	$t0, 324  						# Tam do Vetor - 1 posição
+  li   	$t0, 360  						# Tam do Vetor - 1 posição
   beq  	$s2, $t0, ranking_bubble_itera_i # Verifica se Chegou no Fim 'j'
 
   ##  Comparação
@@ -847,11 +847,11 @@ ranking_bubbleSort_j:
 	s.s		$f0, 40($t0)		##	Guarda valor de V[i] em V[i+1]
 
 ranking_bubble_itera_j:
-  addi 	$s2, $s2, 4  		 # Anda uma Posição
+  addi 	$s2, $s2, 36  		 # Anda uma Posição
   j    	ranking_bubbleSort_j  # Itera j
 
 ranking_bubble_itera_i:
-  addi 	$s1, $s1, 4   			# Anda uma Posição
+  addi 	$s1, $s1, 36   			# Anda uma Posição
   li   	$s2, 0         		  	# Reinializa j
   j    	ranking_bubbleSort_i   	# Itera i
 
