@@ -577,9 +577,9 @@ listar_fim:
 	addi 	$sp , $sp, 8
 	jr		$ra
 
-####====================================####
-####		Opção Gasto Mensal		   				####
-####====================================####
+####===================================####
+####		Opção Gasto Mensal		   ####
+####===================================####
 gasto_mensal:
 	addi 	$sp , $sp, -8
 	sw		$ra , 0($sp)
@@ -727,6 +727,28 @@ gasto_categoria:
 	sw		$ra , 0($sp)
 	sw		$v0 , 4($sp)
 
+	la		$a0, ranking_texto
+	jal		exibe_str
+
+	jal		gasto_categoria_ordena_valor
+
+	la		$s0, v_ranking		# 	Vetor com Indices
+	addi	$s1, $s0, 360			#		Limite
+gasto_categoria_exibe_loop:
+	beq		$s0, $s1, gasto_categoria_exibe_fim
+	lw		$a0, 0($s0)			#	Recebe o Indice
+	beq		$a0, $0, gasto_categoria_loop_itera
+
+#	jal		ranking_fetch_info
+#	add		$a0, $v0, $0
+	add		$a0, $s0, $0
+	jal		exibe_ranking
+
+gasto_categoria_loop_itera:
+	addi	$s0, $s0, 36	#	Anda com o Vetor
+	j			gasto_categoria_exibe_loop
+
+gasto_categoria_exibe_fim:
 
 	lw		$ra , 0($sp)
 	lw		$v0 , 4($sp)
@@ -1153,3 +1175,128 @@ ranking_somatorio_fim:
 	lw		$ra , 0($sp)
 	addi	$sp , $sp, 4
 	jr		$ra
+
+##----------------------------
+gasto_categoria_ordena_valor:
+  addi $sp , $sp, -4
+  sw	 $ra , 0($sp)
+
+  # Zera o Vetor de Indices
+  la   	$s0, v_ranking		#	Endereço Inicial
+  addi 	$s1, $s0, 360			#	Limite
+	sub.s	$f0, $f0, $f0			#	Inicializa um Float com Zero
+
+gasto_categoria_valor_zera_vetor:
+  beq  $s0, $s1, gasto_categoria_valor_zera_vetor_fim	# Verifica se Chegou no Limite
+	sw   $0, 0($s0)										# Guarda '0' no Vetor
+  s.s  $f0,4($s0)										# Guarda '0' no Vetor
+  addi $s0, $s0, 36									# Anda a Posição
+  j    gasto_categoria_valor_zera_vetor
+
+gasto_categoria_valor_zera_vetor_fim:
+  ## Fetch dos Valores
+  jal  	ranking_fetch_indices	# Preenche o Vetor v_gasto_categoria com os Indices das Categorias Existentes
+	jal		ranking_somatorio			#	Soma todos os Valores das Correspondentes Categorias
+  la   	$s0, v_ranking 				# End Inicial do Vetor
+
+  li   	$s1, 0    # Inicializa o 'i'
+  li   	$s2, 0    # Inicializa o 'j'
+
+gasto_categoria_bubbleSort_i:
+  li   	$t0, 360   			 		 # Tam do Vetor - 1 posição
+  beq  	$s1, $t0, gasto_categoria_bubble_fim  # Verifica se Chegou no Fim 'i'
+
+gasto_categoria_bubbleSort_j:
+  li   	$t0, 360  						# Tam do Vetor - 1 posição
+  beq  	$s2, $t0, gasto_categoria_bubble_itera_i # Verifica se Chegou no Fim 'j'
+
+  ##  Comparação
+  add   $t0, $s0, $s2  # Adiciona o Deslocamento ao End. Inicial
+
+  ## Fetch Dos Valores
+  add		$s3, $0, $0
+  add		$s4, $0, $0
+
+  lw    $a0, 0($t0)   # Recebe o Indice de V[i]
+  beq		$a0, $0, gasto_categoria_bubble_itera_j		#	Verifica se o Indice é Válido
+  jal   ranking_fetch_info
+  beq		$v0, $0, gasto_categoria_bubble_itera_j		#	Verifica se o Endereço é Válido
+  add   $s3, $v0, $0  # End. Inicial de V[i]
+
+  lw    $a0, 36($t0)   # Recebe o Indice de V[i+1]
+  beq		$a0, $0, gasto_categoria_bubble_itera_j		#	Verifica se o Indice é Válido
+  jal   ranking_fetch_info
+  beq		$v0, $0, gasto_categoria_bubble_itera_j		#	Verifica se o Endereço é Válido
+  add   $s4, $v0, $0  # End. Inicial de V[i+1]
+
+  add   $a0, $s3, $0
+  add   $a1, $s4, $0
+  beq		$a0, $0, gasto_categoria_bubble_itera_j		#	Verifica se o Indice é Válido
+  beq		$a1, $0, gasto_categoria_bubble_itera_j		#	Verifica se o Indice é Válido
+  jal   gasto_categoria_bubble_compara
+  ##  Comparação
+
+  li    $t0, 1
+  bne   $v0, $t0, gasto_categoria_bubble_itera_j  # V0 informa se precisa ordenar
+
+  ##  Swap
+  add   $t0, $s0, $s2 # Adiciona o Deslocamento ao End. Inicial
+	lw		$t1,  0($t0)		##	Carrega Indice de V[i]
+	lw		$t2, 36($t0)		##	Carrega Indice de V[i+1]
+	sw		$t2, 	0($t0)		##	Guarda Indice de V[i+1] em V[i]
+	sw		$t1, 36($t0)		##	Guarda Indice de V[i] em V[i+1]
+	l.s		$f0,  4($t0)		##	Carrega	valor de V[i]
+	l.s		$f1, 40($t0)		##	Carrega	valor de V[i+1]
+	s.s		$f1, 	4($t0)		##	Guarda valor de V[i+1] em V[i]
+	s.s		$f0, 40($t0)		##	Guarda valor de V[i] em V[i+1]
+
+gasto_categoria_bubble_itera_j:
+  addi 	$s2, $s2, 36  		 						# Anda uma Posição
+  j    	gasto_categoria_bubbleSort_j  # Itera j
+
+gasto_categoria_bubble_itera_i:
+  addi 	$s1, $s1, 36   				# Anda uma Posição
+  li   	$s2, 0         		  	# Reinializa j
+  j    	gasto_categoria_bubbleSort_i   	# Itera i
+
+gasto_categoria_bubble_fim:
+  # Lista Ordenada
+	lw	 	$ra , 0($sp)
+	addi 	$sp , $sp, 4
+	jr	 	$ra
+
+gasto_categoria_bubble_compara:
+  ##  Ordem Crescente
+  addi 	$sp , $sp, -28
+  sw		$ra , 0($sp)
+  sw		$t0 , 4($sp)
+  sw		$s0 , 8($sp)
+  sw		$s1 , 12($sp)
+  sw		$s2 , 16($sp)
+  sw		$s3 , 20($sp)
+  sw		$s4 , 24($sp)
+
+ ##  Load da Informação Relevante
+  addi	$a0, $a0, 16  # V[j]
+  addi  $a1, $a1, 16  # V[j+1]
+
+  jal compara_categoria
+
+  bne $v0,-1,gasto_categoria_b_compara_mantem
+  li 	$v0, 1   # V[j] é Maior q V[j+1]
+  j		gasto_categoria_b_compara_fim
+
+gasto_categoria_b_compara_mantem:
+  li   $v0, 0   # V[j] é Menor q V[j+1]
+  j    gasto_categoria_b_compara_fim
+
+gasto_categoria_b_compara_fim:
+	lw	 $ra , 0($sp)
+	lw	 $t0 , 4($sp)
+	lw	 $s0 , 8($sp)
+	lw	 $s1 , 12($sp)
+	lw	 $s2 , 16($sp)
+	lw	 $s3 , 20($sp)
+	lw	 $s4 , 24($sp)
+  addi $sp , $sp, 28
+  jr	 $ra
